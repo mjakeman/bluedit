@@ -1,0 +1,10 @@
+prefix=/app
+exec_prefix=/app
+libdir=/app/lib
+includedir=/app/include
+
+Name: libcmark
+Description: CommonMark parsing, rendering, and manipulation
+Version: 0.29.0
+Libs: -L${libdir} -lcmark
+Cflags: -I${includedir}

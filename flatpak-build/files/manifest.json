@@ -1,0 +1,66 @@
+{
+  "id" : "com.mattjakeman.bluedit",
+  "runtime" : "org.gnome.Platform",
+  "runtime-version" : "3.32",
+  "runtime-commit" : "a55d0a1ace7e9f8ac573e3024f2050d218d88c844ee41fb571a2419e28a61855",
+  "sdk" : "org.gnome.Sdk",
+  "sdk-commit" : "7b867afead01db03f245f13520cca98713e0f7851a79766e254ac5e4368bcf50",
+  "build-options" : {
+    "cflags" : "-O2 -g",
+    "cxxflags" : "-O2 -g",
+    "env" : {
+      "V" : "1"
+    }
+  },
+  "command" : "bluedit",
+  "modules" : [
+    {
+      "name" : "cmark",
+      "buildsystem" : "cmake",
+      "builddir" : true,
+      "config-opts" : [
+        "-DCMAKE_INSTALL_LIBDIR=lib"
+      ],
+      "sources" : [
+        {
+          "url" : "https://github.com/commonmark/cmark.git",
+          "commit" : "ca83398c7aed70a73b010a6ce9366bac90b7c32d",
+          "type" : "git"
+        }
+      ]
+    },
+    {
+      "name" : "bluedit",
+      "buildsystem" : "meson",
+      "builddir" : true,
+      "sources" : [
+        {
+          "path" : "./",
+          "type" : "dir"
+        }
+      ]
+    }
+  ],
+  "cleanup" : [
+    "/include",
+    "/lib/pkgconfig",
+    "/man",
+    "/share/doc",
+    "/share/gtk-doc",
+    "/share/man",
+    "/share/pkgconfig",
+    "*.la",
+    "*.a"
+  ],
+  "finish-args" : [
+    "--share=network",
+    "--share=ipc",
+    "--socket=x11",
+    "--socket=wayland",
+    "--filesystem=xdg-run/dconf",
+    "--filesystem=~/.config/dconf:ro",
+    "--filesystem=home",
+    "--talk-name=ca.desrt.dconf",
+    "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
+  ]
+}

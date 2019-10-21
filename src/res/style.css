@@ -1,0 +1,50 @@
+.bl-view {
+    border: 1px solid #BDBDBD;
+}
+
+.bl-view-heading {
+    padding: 0 10px;
+    border-top: 3px solid transparent;
+    background-color: #EEEEEE;
+}
+
+.bl-view-heading button {
+    border: none;
+    border-radius: 0;
+    margin: 0 5px;
+}
+
+.bl-view-heading button:hover {
+    border: none;
+    border-radius: 0;
+    background: #d7d7db;
+    box-shadow: none;
+}
+
+.bl-view-heading button:checked {
+    border: none;
+    border-radius: 0;
+    background: #b1b1b3;
+    box-shadow: none;
+}
+
+.save-label {
+    padding: 10px;
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 120%;
+}
+
+.active-editor {
+    background-color: #E3F2FD;
+    border-color: #2196F3;
+}
+
+.active-editor button:hover {
+    background: #BBDEFB;
+}
+
+.active-editor button:checked {
+    background: #0D47A1;
+    color: white;
+}

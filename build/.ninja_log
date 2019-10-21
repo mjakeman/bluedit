@@ -1,0 +1,19 @@
+# ninja log v5
+4	29	1571653062922556658	src/bluedit-resources.h	c39b37d2d3890504
+3	48	1571653062930556767	src/bluedit-resources.c	45bf0e7d31b680da
+48	522	1571653063414563346	src/25a6634@@bluedit@exe/meson-generated_.._bluedit-resources.c.o	6c08391c6cee88df
+1	530	1571653063357562572	data/com.mattjakeman.bluedit.desktop	8558a24c1e5cc2e4
+2	533	1571653063362562640	data/com.mattjakeman.bluedit.appdata.xml	1014d313cf90acd9
+41	829	1571653063721567520	src/25a6634@@bluedit@exe/bl-markdown-view.c.o	9e35bda0e6be912f
+43	839	1571653063729567629	src/25a6634@@bluedit@exe/bl-workspace.c.o	58a79bb8155ec1a9
+0	851	1571653063744567833	subprojects/libsplit/aac8a79@@split@sha/spl-tile-manager.c.o	5927ea5d9d42ac5f
+1	863	1571653063753567955	subprojects/libsplit/aac8a79@@split@sha/gtk_spl-workspace.c.o	732e09eb0da03b73
+29	863	1571653063751567927	src/25a6634@@bluedit@exe/main.c.o	d943d377ad3d10f7
+39	864	1571653063755567982	src/25a6634@@bluedit@exe/bl-document.c.o	78f4681045df1f24
+38	868	1571653063760568050	src/25a6634@@bluedit@exe/views_bl-editor.c.o	55366519a59469b0
+35	870	1571653063762568077	src/25a6634@@bluedit@exe/bl-multi-editor.c.o	8df2fa216d3706dd
+34	871	1571653063763568091	src/25a6634@@bluedit@exe/bluedit-window.c.o	8107a5864eb51290
+46	872	1571653063763568091	src/25a6634@@bluedit@exe/views_bl-view.c.o	aee86733e7d77b7a
+863	938	1571653063830569002	subprojects/libsplit/libsplit.so	d53d8056b70d6c7a
+938	1249	1571653064115572876	subprojects/libsplit/aac8a79@@split@sha/libsplit.so.symbols	79403914290ccf3d
+1249	1402	1571653064293575296	src/bluedit	2e26e8d0e15b0094

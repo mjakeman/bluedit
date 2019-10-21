@@ -1,0 +1,7 @@
+data/com.mattjakeman.bluedit.desktop.in
+data/com.mattjakeman.bluedit.appdata.xml.in
+data/com.mattjakeman.bluedit.gschema.xml
+src/bluedit-window.ui
+src/main.c
+src/bluedit-window.c
+

@@ -1,0 +1,68 @@
+[
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isubprojects/libsplit/aac8a79@@split@sha -Isubprojects/libsplit -I../subprojects/libsplit -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -fPIC -pthread -MD -MQ 'subprojects/libsplit/aac8a79@@split@sha/spl-tile-manager.c.o' -MF 'subprojects/libsplit/aac8a79@@split@sha/spl-tile-manager.c.o.d' -o 'subprojects/libsplit/aac8a79@@split@sha/spl-tile-manager.c.o' -c ../subprojects/libsplit/spl-tile-manager.c",
+    "file": "../subprojects/libsplit/spl-tile-manager.c",
+    "output": "subprojects/libsplit/aac8a79@@split@sha/spl-tile-manager.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isubprojects/libsplit/aac8a79@@split@sha -Isubprojects/libsplit -I../subprojects/libsplit -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -fPIC -pthread -MD -MQ 'subprojects/libsplit/aac8a79@@split@sha/gtk_spl-workspace.c.o' -MF 'subprojects/libsplit/aac8a79@@split@sha/gtk_spl-workspace.c.o.d' -o 'subprojects/libsplit/aac8a79@@split@sha/gtk_spl-workspace.c.o' -c ../subprojects/libsplit/gtk/spl-workspace.c",
+    "file": "../subprojects/libsplit/gtk/spl-workspace.c",
+    "output": "subprojects/libsplit/aac8a79@@split@sha/gtk_spl-workspace.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/meson-generated_.._bluedit-resources.c.o' -MF 'src/25a6634@@bluedit@exe/meson-generated_.._bluedit-resources.c.o.d' -o 'src/25a6634@@bluedit@exe/meson-generated_.._bluedit-resources.c.o' -c src/bluedit-resources.c",
+    "file": "src/bluedit-resources.c",
+    "output": "src/25a6634@@bluedit@exe/meson-generated_.._bluedit-resources.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/main.c.o' -MF 'src/25a6634@@bluedit@exe/main.c.o.d' -o 'src/25a6634@@bluedit@exe/main.c.o' -c ../src/main.c",
+    "file": "../src/main.c",
+    "output": "src/25a6634@@bluedit@exe/main.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/bluedit-window.c.o' -MF 'src/25a6634@@bluedit@exe/bluedit-window.c.o.d' -o 'src/25a6634@@bluedit@exe/bluedit-window.c.o' -c ../src/bluedit-window.c",
+    "file": "../src/bluedit-window.c",
+    "output": "src/25a6634@@bluedit@exe/bluedit-window.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/bl-multi-editor.c.o' -MF 'src/25a6634@@bluedit@exe/bl-multi-editor.c.o.d' -o 'src/25a6634@@bluedit@exe/bl-multi-editor.c.o' -c ../src/bl-multi-editor.c",
+    "file": "../src/bl-multi-editor.c",
+    "output": "src/25a6634@@bluedit@exe/bl-multi-editor.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/views_bl-editor.c.o' -MF 'src/25a6634@@bluedit@exe/views_bl-editor.c.o.d' -o 'src/25a6634@@bluedit@exe/views_bl-editor.c.o' -c ../src/views/bl-editor.c",
+    "file": "../src/views/bl-editor.c",
+    "output": "src/25a6634@@bluedit@exe/views_bl-editor.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/bl-document.c.o' -MF 'src/25a6634@@bluedit@exe/bl-document.c.o.d' -o 'src/25a6634@@bluedit@exe/bl-document.c.o' -c ../src/bl-document.c",
+    "file": "../src/bl-document.c",
+    "output": "src/25a6634@@bluedit@exe/bl-document.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/bl-markdown-view.c.o' -MF 'src/25a6634@@bluedit@exe/bl-markdown-view.c.o.d' -o 'src/25a6634@@bluedit@exe/bl-markdown-view.c.o' -c ../src/bl-markdown-view.c",
+    "file": "../src/bl-markdown-view.c",
+    "output": "src/25a6634@@bluedit@exe/bl-markdown-view.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/bl-workspace.c.o' -MF 'src/25a6634@@bluedit@exe/bl-workspace.c.o.d' -o 'src/25a6634@@bluedit@exe/bl-workspace.c.o' -c ../src/bl-workspace.c",
+    "file": "../src/bl-workspace.c",
+    "output": "src/25a6634@@bluedit@exe/bl-workspace.c.o"
+  },
+  {
+    "directory": "/var/home/mjake/Downloads/ProgrammingL3/bluedit/build",
+    "command": "cc -Isrc/25a6634@@bluedit@exe -Isrc -I../src -I../subprojects/libsplit/include -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/fribidi -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/libdrm -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib64/dbus-1.0/include -I/var/home/mjake/Downloads/ProgrammingL3/bluedit/build -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -g -pthread -MD -MQ 'src/25a6634@@bluedit@exe/views_bl-view.c.o' -MF 'src/25a6634@@bluedit@exe/views_bl-view.c.o.d' -o 'src/25a6634@@bluedit@exe/views_bl-view.c.o' -c ../src/views/bl-view.c",
+    "file": "../src/views/bl-view.c",
+    "output": "src/25a6634@@bluedit@exe/views_bl-view.c.o"
+  }
+]

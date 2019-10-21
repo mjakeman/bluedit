@@ -1,0 +1,5 @@
+[Runtime]
+name=com.mattjakeman.bluedit.Debug
+
+[ExtensionOf]
+ref=app/com.mattjakeman.bluedit/x86_64/master
