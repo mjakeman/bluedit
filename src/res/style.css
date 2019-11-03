@@ -48,3 +48,8 @@
     background: #0D47A1;
     color: white;
 }
+
+/* Black dot for indicating unsaved changes */
+.save-status {
+    margin: 0 5px;
+}

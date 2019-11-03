@@ -28,10 +28,22 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (BlDocument, bl_document, BL, DOCUMENT, GtkTextBuffer)
 
 BlDocument* bl_document_new_from_file(GFile* file);
+BlDocument* bl_document_new_untitled ();
 GFile* bl_document_get_file(BlDocument* doc);
 GtkTextBuffer* bl_document_get_buffer(BlDocument* doc);
 gchar* bl_document_get_basename(BlDocument* doc);
 gchar* bl_document_get_contents(BlDocument* doc);
 gchar* bl_document_get_uri (BlDocument *doc);
+void bl_document_set_file (BlDocument* document, GFile* file);
+gboolean bl_document_is_untitled (BlDocument* doc);
+
+// Low Level Hash Functions
+void bl_document_set_save_hash (BlDocument *self, guint cmp);
+guint bl_document_get_save_hash (BlDocument *self);
+guint bl_document_get_current_hash (BlDocument *self);
+
+// High Level Hash Functions
+gboolean bl_document_unsaved_changes (BlDocument *self);
+void bl_document_update_save_hash (BlDocument *self);
 
 G_END_DECLS

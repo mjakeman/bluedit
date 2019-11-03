@@ -37,6 +37,7 @@ struct _BlueditWindow
     GtkHeaderBar*       header_bar;
     GtkButton*          open_btn;
     GtkButton*          save_btn;
+    GtkButton*          new_btn;
 };
 
 G_DEFINE_TYPE (BlueditWindow, bluedit_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -60,6 +61,7 @@ bluedit_window_class_init (BlueditWindowClass *klass)
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, header_bar);
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, open_btn);
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, save_btn);
+    gtk_widget_class_bind_template_child (widget_class, BlueditWindow, new_btn);
 
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
@@ -88,6 +90,21 @@ bluedit_window_class_init (BlueditWindowClass *klass)
                  NULL  /* param_types */);
 }
 
+BlDocument *bluedit_window_new_document (BlueditWindow *window)
+{
+    BlDocument *document = bl_document_new_untitled ();
+    window->open_documents = g_list_append(window->open_documents, document);
+
+    // Log it
+    g_debug("Opened Document");
+
+    // Emit signals so that other objects can update accordingly
+    g_signal_emit (window, signals[DOC_ADDED], 0);
+
+    // Success
+    return document;
+}
+
 BlDocument* bluedit_window_open_document (BlueditWindow* window, BlDocument* document)
 {
     // First, let's check if the file is valid
@@ -106,6 +123,9 @@ BlDocument* bluedit_window_open_document (BlueditWindow* window, BlDocument* doc
     GList* elem;
     for (elem = open; elem != NULL; elem = elem->next)
     {
+        if (bl_document_is_untitled (elem->data))
+            continue;
+
         // This is the file corresponding to the iterator
         GFile* existing_file = bl_document_get_file (elem->data);
 
@@ -204,6 +224,15 @@ cb_save_active(GtkButton* button, BlueditWindow* self)
     bl_editor_save_file (editor);
 }
 
+static void
+cb_new_file (GtkButton* button, BlueditWindow* self)
+{
+    g_debug ("Creating new file");
+    BlDocument *doc = bluedit_window_new_document (self);
+    BlMultiEditor *multi = bluedit_window_get_multi (self);
+    bl_multi_editor_open (multi, doc);
+}
+
 GList* bluedit_window_get_open_documents (BlueditWindow* window)
 {
     return window->open_documents;
@@ -223,15 +252,11 @@ void update_tree(BlueditWindow* window)
     for (elem = documents; elem != NULL; elem = elem->next)
     {
         BlDocument* doc = elem->data;
-        GFile* file = bl_document_get_file(doc);
 
-        if (file == NULL)
-        {
-            g_error("File is invalid (null pointer)");
-            return;
-        }
-
-        gchar* basename = g_file_get_basename(file);
+        // This will either be the file name,
+        // or "Untitled Document' depending on
+        // whether the file actually exists.
+        gchar* basename = bl_document_get_basename (doc);
 
         g_debug("%s", basename);
 
@@ -249,6 +274,116 @@ void update_tree(BlueditWindow* window)
 GObject* bluedit_window_get_multi(BlueditWindow* self)
 {
     return G_OBJECT(self->multi_editor);
+}
+
+static gboolean
+cb_close_window (GtkWidget *widget,
+                 GdkEvent  *event,
+                 gpointer   null_ptr)
+{
+    BlueditWindow *self = BLUEDIT_WINDOW (widget);
+
+    GList *docs = bluedit_window_get_open_documents (self);
+    GList *unsaved = NULL;
+
+    for (GList *elem = docs; elem != NULL; elem = elem->next)
+    {
+        if (bl_document_unsaved_changes (BL_DOCUMENT (elem->data)))
+        {
+            unsaved = g_list_prepend (unsaved, BL_DOCUMENT (elem->data));
+        }
+    }
+
+    if (unsaved != NULL)
+    {
+        // Show dialogue
+        guint length = g_list_length (unsaved);
+        GtkWidget *dialogue, *content_area, *content_box;
+
+        if (length == 1)
+        {
+            // One File
+            BlDocument *doc = BL_DOCUMENT (unsaved->data);
+            gchar *filename = bl_document_get_basename (doc);
+
+            dialogue = gtk_message_dialog_new (GTK_WINDOW (self),
+                                               GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                               GTK_MESSAGE_WARNING,
+                                               GTK_BUTTONS_NONE,
+                                               "Save changes to %s before closing?",
+                                               filename);
+
+            gtk_message_dialog_format_secondary_markup (GTK_MESSAGE_DIALOG (dialogue),
+                                                      "The file <b>%s</b> has not been saved. Would you like to save this file before closing?",
+                                                      filename);
+        }
+        else
+        {
+            // Multiple files
+            dialogue = gtk_message_dialog_new (GTK_WINDOW (self),
+                                               GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                               GTK_MESSAGE_WARNING,
+                                               GTK_BUTTONS_NONE,
+                                               "There are %d documents with unsaved changes. Save changes before closing?",
+                                               length);
+
+            gtk_message_dialog_format_secondary_markup (GTK_MESSAGE_DIALOG (dialogue),
+                                                        "Select the files you would like to save:");
+
+            content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialogue));
+            content_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+
+            GtkWidget *list_box = gtk_list_box_new ();
+            gtk_box_pack_start (GTK_BOX (content_box), list_box, FALSE, FALSE, 0);
+
+            for (GList *elem = unsaved; elem != NULL; elem = elem->next)
+            {
+                BlDocument *doc = BL_DOCUMENT (elem->data);
+                gchar *filename = bl_document_get_basename (doc);
+
+                GtkWidget *check_box = gtk_check_button_new_with_label (filename);
+                gtk_list_box_insert (GTK_LIST_BOX (list_box), check_box, -1);
+            }
+
+            gtk_container_add (GTK_CONTAINER (content_area), content_box);
+            gtk_widget_show_all (content_box);
+        }
+
+        // Buttons
+        GtkWidget *close_btn = gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Discard Changes", GTK_RESPONSE_CLOSE);
+        gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Cancel", GTK_RESPONSE_CANCEL);
+        gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Save", GTK_RESPONSE_OK);
+        gtk_dialog_set_default_response (GTK_DIALOG (dialogue), GTK_RESPONSE_CANCEL);
+        helper_set_widget_css_class (close_btn, "destructive-action");
+
+        int result = gtk_dialog_run (GTK_DIALOG (dialogue));
+        gtk_widget_destroy (dialogue);
+
+        switch (result)
+        {
+            case GTK_RESPONSE_OK:
+            {
+                // Save the files
+                if (length == 1)
+                {
+                }
+                return TRUE;
+                break;
+            }
+
+            case GTK_RESPONSE_CLOSE:
+                return FALSE;
+                break;
+
+            default:
+            case GTK_RESPONSE_CANCEL:
+                return TRUE;
+                break;
+        }
+    }
+
+    // Close the window
+    return FALSE;
 }
 
 void cb_tree_changed(GtkTreeView* widget, GtkTreePath* path,
@@ -304,31 +439,51 @@ static void cb_drag_data_get (GtkTreeView      *view,
     gtk_tree_model_get(model, &iter, 1, &doc, -1); // 1 here is the BlDocument column
 
     // If this is not a BlDocument, then gracefully exit
-    g_return_if_fail (BL_IS_DOCUMENT (doc));
+    // TODO: Can we do this?
+    if (!BL_IS_DOCUMENT (doc))
+        gtk_drag_finish (context, FALSE, FALSE, time);
 
-    // Set selection data to file path
-    gchar *uri = bl_document_get_uri (doc);
-
+    // Info is the format of the drag and drop operation. The drag destination
+    // decides which format it wants and sets this variable accordingly.
     switch (info)
     {
-        case 0:
+        case BL_TARGET_TEXT:
         {
             // Case 0: Plain Text
-            gtk_selection_data_targets_include_text (data);
-            gtk_selection_data_set_text (data, uri, -1);
+            // We simply get the contents of the editor and
+            // set it as the drag data.
+            // TODO: In future we may want to convert this
+            // to rich text (e.g. with pandoc).
+            gchar *contents = bl_document_get_contents (doc);
+            gtk_selection_data_set_text (data, contents, -1);
             break;
         }
-        case 1:
+        case BL_TARGET_URI:
         {
             // Case 1: Uri List
-            gtk_selection_data_targets_include_uri (data);
+            // This is the most likely target to be requested. Here
+            // we provide a URI-link to the file to the requesting
+            // program, so it can load it from disk. It is up to the
+            // calling program to ensure the URI is valid.
+            gchar *uri = bl_document_get_uri (doc);
             gchar *uris[] = { uri, NULL };
             gtk_selection_data_set_uris (data, uris);
             break;
         }
+        case BL_TARGET_DOC:
+        {
+            // Case 2: Internal BlDocument object.
+            // This will be used to drag and drop internal representations of
+            // files within the programme. This is particularly useful in the
+            // case of "Untitled Files", in which we cannot simply transfer
+            // data by path on disk, as it does not yet exist.
+            gtk_selection_data_set (data,
+                                    gdk_atom_intern_static_string ("BL_DOCUMENT"),
+                                    8,
+                                    (void *)&doc,
+                                    sizeof (gpointer));
+        }
     }
-
-    g_debug("Boo");
 }
 
 static void
@@ -360,6 +515,14 @@ bluedit_window_init (BlueditWindow *self)
     g_signal_connect(G_OBJECT(self->save_btn), "clicked",
                      G_CALLBACK(cb_save_active), self);
 
+    // Bind new file button
+    g_signal_connect(G_OBJECT(self->new_btn), "clicked",
+                     G_CALLBACK(cb_new_file), self);
+
+    // Bind on delete signal
+    g_signal_connect(G_OBJECT(self), "delete-event",
+                     G_CALLBACK(cb_close_window), NULL);
+
     // Create GUI
     GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
@@ -386,21 +549,23 @@ bluedit_window_init (BlueditWindow *self)
                      G_CALLBACK(cb_tree_changed), self);
 
     // Tree View drag and drop
-    // TODO: Use an application independent version of this
-    // which relates to underlying files. Maybe just use a uri
-    // and then find the corresponding BlDocument in application?
-    GtkTargetEntry target[] = {
-        { "text/plain", 0, 0 },
-        { "text/uri-list", 0, 1 }
-
-    };
+    GtkTargetList *list = gtk_target_list_new (NULL, 0);
+    gtk_target_list_add (list, gdk_atom_intern_static_string ("BL_DOCUMENT"),
+                         GTK_TARGET_SAME_APP, BL_TARGET_DOC);
+    gtk_target_list_add (list, gdk_atom_intern_static_string ("text/uri-list"),
+                         0, BL_TARGET_URI);
+    gtk_target_list_add (list, gdk_atom_intern_static_string ("text/plain"),
+                         0, BL_TARGET_TEXT);
 
     gtk_tree_view_enable_model_drag_source (GTK_TREE_VIEW(tree),
                                             GDK_BUTTON1_MASK,
-                                            target, 2,
+                                            NULL, 0,
                                             GDK_ACTION_COPY);
 
-    // Enable drag-data-get signal
+    gtk_drag_source_set_target_list (tree, list);
+
+
+    // Enable drag and drop signals
     g_signal_connect(G_OBJECT(tree), "drag-data-get", G_CALLBACK(cb_drag_data_get), NULL);
 
     // Window file management signals

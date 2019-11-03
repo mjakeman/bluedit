@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=bluedit
-Exec=bluedit
-Terminal=false
-Type=Application
-Categories=GTK;
-StartupNotify=true
