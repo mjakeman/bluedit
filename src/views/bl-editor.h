@@ -35,5 +35,6 @@ BlDocument* bl_editor_get_document(BlEditor* self);
 void bl_editor_save_file (BlEditor *editor);
 void bl_editor_save_file_as (BlEditor *editor);
 void bl_editor_close_file (BlEditor *self);
+gboolean bl_editor_is_saved (BlEditor *editor);
 
 G_END_DECLS

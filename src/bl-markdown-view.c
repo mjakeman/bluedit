@@ -211,69 +211,68 @@ initialise_buffer (BlMarkdownView* self)
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(self));
 
     // Create tags
-    // TODO: Generate these from CSS
+    GtkTextTagTable *tag_table = gtk_text_buffer_get_tag_table (buffer);
 
-    GtkTextIter start;
-    GtkTextIter end;
-    gtk_text_buffer_get_start_iter (buffer, &start);
-    gtk_text_buffer_get_end_iter (buffer, &end);
+    // TODO: Find a better way of telling if the buffer has been initialised
+    // We should probably move this into BlDocument itself to handle multiple
+    // file types outside of just markdown.
+    if (gtk_text_tag_table_lookup (tag_table, "heading1") == NULL)
+    {
+        // PSA: `create_tag` needs to be NULL terminated, otherwise
+        // everything breaks, in a very painful way.
 
-    // Clear existing tags
-    gtk_text_buffer_remove_all_tags (buffer, &start, &end);
+        // Tag: Heading 1
+        gtk_text_buffer_create_tag(buffer, "heading1",
+                                   "scale", (double)2,
+                                   NULL);
+        // Tag: Heading 2
+        gtk_text_buffer_create_tag(buffer, "heading2",
+                                   "foreground", "#d70022",
+                                   "scale", (double)1.5,
+                                   NULL);
 
-    // PSA: `create_tag` needs to be NULL terminated, otherwise
-    // everything breaks, in a very painful way.
+        // Tag: Heading 3
+        gtk_text_buffer_create_tag(buffer, "heading3",
+                                   "foreground", "#0a84ff",
+                                   "scale", (double)1.4,
+                                   NULL);
 
-    // Tag: Heading 1
-    gtk_text_buffer_create_tag(buffer, "heading1",
-                               "scale", (double)2,
-                               NULL);
-    // Tag: Heading 2
-    gtk_text_buffer_create_tag(buffer, "heading2",
-                               "foreground", "#d70022",
-                               "scale", (double)1.5,
-                               NULL);
+        // Tag: Heading 4
+        gtk_text_buffer_create_tag(buffer, "heading4",
+                                   "foreground", "#ff9400",
+                                   "scale", (double)1.3,
+                                   NULL);
 
-    // Tag: Heading 3
-    gtk_text_buffer_create_tag(buffer, "heading3",
-                               "foreground", "#0a84ff",
-                               "scale", (double)1.4,
-                               NULL);
+        // Tag: Heading 5
+        gtk_text_buffer_create_tag(buffer, "heading5",
+                                   "foreground", "#9400ff",
+                                   "scale", (double)1.2,
+                                   NULL);
 
-    // Tag: Heading 4
-    gtk_text_buffer_create_tag(buffer, "heading4",
-                               "foreground", "#ff9400",
-                               "scale", (double)1.3,
-                               NULL);
+        // Tag: Heading 6
+        gtk_text_buffer_create_tag(buffer, "heading6",
+                                   "foreground", "#363959",
+                                   "weight", PANGO_WEIGHT_BOLD,
+                                   NULL);
 
-    // Tag: Heading 5
-    gtk_text_buffer_create_tag(buffer, "heading5",
-                               "foreground", "#9400ff",
-                               "scale", (double)1.2,
-                               NULL);
+        // Tag: Bold
+        gtk_text_buffer_create_tag(buffer, "bold",
+                                   "weight", PANGO_WEIGHT_BOLD,
+                                   NULL);
 
-    // Tag: Heading 6
-    gtk_text_buffer_create_tag(buffer, "heading6",
-                               "foreground", "#363959",
-                               "weight", PANGO_WEIGHT_BOLD,
-                               NULL);
+        // Tag: Italic
+        gtk_text_buffer_create_tag(buffer, "italic",
+                                   "style", PANGO_STYLE_ITALIC,
+                                   NULL);
 
-    // Tag: Bold
-    gtk_text_buffer_create_tag(buffer, "bold",
-                               "weight", PANGO_WEIGHT_BOLD,
-                               NULL);
+        // Tag: Widget Font Styling
+        self->font_tag =
+            gtk_text_buffer_create_tag (buffer, "user-style", NULL);
 
-    // Tag: Italic
-    gtk_text_buffer_create_tag(buffer, "italic",
-                               "style", PANGO_STYLE_ITALIC,
-                               NULL);
+        gtk_text_tag_set_priority (self->font_tag, 0);
+    }
 
-    // Tag: Widget Font Styling
-    self->font_tag =
-    gtk_text_buffer_create_tag (buffer, "user-style",
-                                NULL);
-
-    gtk_text_tag_set_priority (self->font_tag, 0);
+    self->font_tag = gtk_text_tag_table_lookup (tag_table, "user-style");
 
     update_font (self);
 

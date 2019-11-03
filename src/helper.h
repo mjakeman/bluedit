@@ -38,3 +38,9 @@ helper_remove_widget_css_class (GtkWidget *widget, gchar* value)
     context = gtk_widget_get_style_context(widget);
     gtk_style_context_remove_class(context, value);
 }
+
+static enum {
+    BL_TARGET_DOC,
+    BL_TARGET_URI,
+    BL_TARGET_TEXT,
+};

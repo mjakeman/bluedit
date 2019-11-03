@@ -1,28 +1,28 @@
 {
-    "app-id": "com.mattjakeman.bluedit",
-    "runtime": "org.gnome.Platform",
-    "runtime-version": "3.32",
-    "sdk": "org.gnome.Sdk",
-    "command": "bluedit",
-    "finish-args": [
+    "app-id" : "com.mattjakeman.bluedit",
+    "runtime" : "org.gnome.Platform",
+    "runtime-version" : "3.32",
+    "sdk" : "org.gnome.Sdk",
+    "command" : "bluedit",
+    "finish-args" : [
         "--share=network",
         "--share=ipc",
         "--socket=x11",
         "--socket=wayland",
         "--filesystem=xdg-run/dconf",
         "--filesystem=~/.config/dconf:ro",
-		"--filesystem=home",
+        "--filesystem=home",
         "--talk-name=ca.desrt.dconf",
         "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
     ],
-    "build-options": {
-        "cflags": "-O2 -g",
-        "cxxflags": "-O2 -g",
-        "env": {
-            "V": "1"
+    "build-options" : {
+        "cflags" : "-O2 -g",
+        "cxxflags" : "-O2 -g",
+        "env" : {
+            "V" : "1"
         }
     },
-    "cleanup": [
+    "cleanup" : [
         "/include",
         "/lib/pkgconfig",
         "/man",
@@ -33,27 +33,29 @@
         "*.la",
         "*.a"
     ],
-    "modules": [
+    "modules" : [
         {
-            "name": "cmark",
-            "buildsystem": "cmake",
-            "builddir": true,
-            "config-opts": ["-DCMAKE_INSTALL_LIBDIR=lib"],
-            "sources": [
-            	{
-            		"type": "git",
-            		"url": "https://github.com/commonmark/cmark.git"
-            	}
+            "name" : "cmark",
+            "buildsystem" : "cmake",
+            "builddir" : true,
+            "config-opts" : [
+                "-DCMAKE_INSTALL_LIBDIR=lib"
+            ],
+            "sources" : [
+                {
+                    "type" : "git",
+                    "url" : "https://github.com/commonmark/cmark.git"
+                }
             ]
         },
         {
-            "name": "bluedit",
-            "builddir": true,
-            "buildsystem": "meson",
-            "sources": [
+            "name" : "bluedit",
+            "builddir" : true,
+            "buildsystem" : "meson",
+            "sources" : [
                 {
-                    "type": "dir",
-                    "path": "./"
+                    "type" : "dir",
+                    "path" : "./"
                 }
             ]
         }

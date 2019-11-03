@@ -30,9 +30,11 @@ struct _BlEditor
     GtkLabel *file_label;
     BlMultiEditor *multi;
     GtkOverlay *overlay;
+    GtkLabel *save_status;
 
     // Current Document
     BlDocument *document;
+    gboolean saved;
 };
 
 G_DEFINE_TYPE (BlEditor, bl_editor, BL_TYPE_VIEW)
@@ -77,11 +79,24 @@ bl_editor_class_init (BlEditorClass *klass)
                  NULL  /* param_types */);
 }
 
-void focus_changed(GtkTextView* widget, BlEditor* editor)
+static void
+update_save_label (BlDocument *doc,
+                   BlEditor *editor)
+{
+    gboolean result = bl_document_unsaved_changes (doc);
+    editor->saved = !result;
+
+    if (editor->saved)
+        gtk_widget_hide (GTK_WIDGET (editor->save_status));
+    else
+        gtk_widget_show (GTK_WIDGET (editor->save_status));
+}
+
+void focus_changed (GtkTextView* widget, BlEditor* editor)
 {
     // Parameter sanity checks
-    g_return_if_fail(GTK_IS_TEXT_VIEW(widget));
-    g_return_if_fail(BL_IS_EDITOR(editor));
+    g_return_if_fail (GTK_IS_TEXT_VIEW(widget));
+    g_return_if_fail (BL_IS_EDITOR(editor));
 
     // Whenever the user is using the text view, we (the BlEditor)
     // have focus in the application. We notify the BlMultiEditor
@@ -90,10 +105,21 @@ void focus_changed(GtkTextView* widget, BlEditor* editor)
     // will open in this BlEditor.
 
     // Log it
-    g_debug("Editor focus changed");
+    g_debug ("Editor focus changed");
+
+    // TODO: Cheap way of updating save-state.
+    // We will certainly want to refactor this into BlDocument,
+    // maybe using signals (e.g. on the DOC_SAVED signal, we could
+    // update all editors)
+    update_save_label (editor->document, editor);
 
     // Notify multi-editor
     g_signal_emit (editor, signals[ACTIVE_FOCUS], 0);
+}
+
+gboolean bl_editor_is_saved (BlEditor *editor)
+{
+    return editor->saved;
 }
 
 // Prompts the user to save the current file
@@ -129,6 +155,7 @@ void bl_editor_save_file_as (BlEditor *editor)
         gchar* contents = bl_document_get_contents(doc);
         gint len = strlen(contents);
         g_file_replace_contents (file, contents, len, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, NULL);
+        editor->document = bluedit_window_open_document_from_file (BLUEDIT_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET (editor))), file);
 
         g_free (filename);
     }
@@ -193,14 +220,21 @@ void bl_editor_save_file (BlEditor *editor)
 
     GFile* file = bl_document_get_file (doc);
 
+    // If file is none (i.e. Untitled file), then we will save as
     if (file == NULL)
     {
         bl_editor_save_file_as (editor);
+        return;
     }
 
     gchar* contents = bl_document_get_contents(doc);
     gint len = strlen(contents);
     g_file_replace_contents (file, contents, len, NULL, TRUE, G_FILE_CREATE_NONE, NULL, NULL, NULL);
+
+    // Update save status
+    editor->saved = TRUE;
+    bl_document_update_save_hash (doc);
+    gtk_widget_hide (GTK_WIDGET (editor->save_status));
 
     // Show Overlay
     GtkWidget *label = gtk_label_new("File Saved");
@@ -222,6 +256,16 @@ void bl_editor_close_file (BlEditor *self)
     gtk_label_set_text (self->file_label, "No Open Files");
     bl_view_remove_decoration_style (BL_VIEW (self), "active-editor");
     self->document = NULL;
+    self->saved = TRUE;
+}
+
+static void
+cb_changed (GtkTextBuffer *doc,
+            BlEditor      *editor)
+{
+    // BlDocument is subclassed from GtkTextBuffer
+    g_return_if_fail (BL_IS_DOCUMENT (doc));
+    update_save_label (BL_DOCUMENT (doc), editor);
 }
 
 void bl_editor_load_file(BlEditor* self, BlDocument* document)
@@ -230,9 +274,6 @@ void bl_editor_load_file(BlEditor* self, BlDocument* document)
     g_return_if_fail (BL_IS_EDITOR (self));
     g_return_if_fail (BL_IS_DOCUMENT (document));
 
-    // TODO: Tell the multi-editor that we have
-    // loaded a file, and what file it is.
-
     // Check if file is open
     if (strcmp(gtk_stack_get_visible_child_name(self->stack), "open-prompt") == 0)
     {
@@ -240,8 +281,15 @@ void bl_editor_load_file(BlEditor* self, BlDocument* document)
     }
 
     BlMarkdownView* view = self->text_view;
-    bl_markdown_view_set_buffer (view, bl_document_get_buffer (document));
+    GtkTextBuffer *text = bl_document_get_buffer (document);
+    g_return_if_fail (GTK_IS_TEXT_BUFFER (text));
+    bl_markdown_view_set_buffer (view, text);
     self->document = document;
+
+    // Save Handling
+    self->saved = TRUE;
+    g_signal_connect (bl_document_get_buffer (document), "changed",
+                      (GCallback)cb_changed, self);
 
     // Update Heading
     gtk_label_set_text (self->file_label, bl_document_get_basename (document));
@@ -260,76 +308,49 @@ BlDocument* bl_editor_get_document(BlEditor* self)
 static void cb_drag_data(BlEditor* self, GdkDragContext* context, gint x, gint y,
                          GtkSelectionData* data, guint info, guint time, gpointer null_ptr)
 {
-    g_debug("Dropped!");
+    g_return_if_fail (BL_IS_EDITOR (self));
 
-    GdkAtom target = gtk_selection_data_get_target (data);
-
-    g_debug ("%s", gdk_atom_name (target));
-
-    if (strcmp (gdk_atom_name (target), "BL_DOCUMENT") == 0)
+    // URI List
+    if (info == BL_TARGET_URI)
     {
-        g_debug ("BlDocument Dropped");
-    }
+        // IMPORTANT: Only use the first uri in the list
+        // and open the rest in the background
+        gchar** array = gtk_selection_data_get_uris(data);
+        GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(self));
+        gboolean first_file = TRUE;
 
-    // IMPORTANT: Only use the first uri in the list
-    // and open the rest in the background
-    gchar** array = gtk_selection_data_get_uris(data);
-    GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(self));
-    gboolean first_file = TRUE;
-
-    for (gchar** i = array; *i != NULL; ++i)
-    {
-        GFile* file = g_file_new_for_uri (*i);
-        BlDocument* doc = bluedit_window_open_document_from_file (BLUEDIT_WINDOW(window), file);
-
-        if (doc == NULL)
+        for (gchar** i = array; *i != NULL; ++i)
         {
-            g_error("Document is invalid");
-            return;
+            GFile* file = g_file_new_for_uri (*i);
+            BlDocument* doc = bluedit_window_open_document_from_file (BLUEDIT_WINDOW(window), file);
+
+            if (first_file == TRUE)
+            {
+                bl_editor_load_file (self, doc);
+                first_file = FALSE;
+            }
         }
 
-        if (first_file == TRUE)
-        {
-            bl_editor_load_file (self, doc);
-            first_file = FALSE;
-        }
-
-        g_debug ("%s", g_file_get_basename(file));
+        gtk_drag_finish (context, TRUE, FALSE, time);
     }
-}
+    // BlDocument
+    else if (info == BL_TARGET_DOC)
+    {
+        // Get document pointer from data
+        // TODO: Clean this up, majorly
+        BlDocument **doc = (void *) gtk_selection_data_get_data (data);
+        if (BL_IS_DOCUMENT (*doc))
+        {
+            bl_editor_load_file (self, *doc);
+            gtk_drag_finish (context, TRUE, FALSE, time);
+        }
+        else
+        {
+            g_critical ("BlDocument not valid");
+        }
+    }
 
-static void cb_on_realise(BlEditor* self)
-{
-    // Parameter sanity checks
-    g_return_if_fail (BL_IS_EDITOR(self));
-
-    // We've created a new BlEditor instance, so let's register
-    // it with the BlMultiEditor singleton. This keeps track of
-    // editor instances for us.
-    GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(self));
-
-    // Check that the window is real and usable
-    g_assert(BLUEDIT_IS_WINDOW(window));
-
-    // Get the multi editor singleton
-    GObject* multi = bluedit_window_get_multi(BLUEDIT_WINDOW(window));
-    self->multi = BL_MULTI_EDITOR(multi);
-
-    // Check multi-editor
-    g_assert(BL_IS_MULTI_EDITOR (multi));
-
-    // Register this editor instance with the singleton
-    bl_multi_editor_register (BL_MULTI_EDITOR(multi), self);
-
-    // Drag and Drop
-    GtkTargetEntry target = { "text/uri-list", 0, 0 };
-
-    gtk_drag_dest_set(GTK_WIDGET(self), GTK_DEST_DEFAULT_ALL,
-                      &target, 1,
-                      GDK_ACTION_COPY);
-
-    g_signal_connect(G_OBJECT(self), "drag-data-received",
-                     G_CALLBACK(cb_drag_data), NULL);
+    gtk_drag_finish (context, FALSE, FALSE, time);
 }
 
 static void
@@ -377,6 +398,16 @@ cb_save_as (GtkButton *btn, BlEditor *self)
 }
 
 static void
+cb_word_wrap (GtkToggleButton *btn, BlEditor *self)
+{
+    gboolean state = gtk_toggle_button_get_active (btn);
+    if (state)
+        gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (self->text_view), GTK_WRAP_WORD);
+    else
+        gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (self->text_view), GTK_WRAP_NONE);
+}
+
+static void
 cb_close (GtkButton *btn, BlEditor *self)
 {
     // Remove the file from the progamme
@@ -408,6 +439,14 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
     gtk_box_pack_start (GTK_BOX (popover_box), font_btn, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (font_btn), "font-set",
                       G_CALLBACK (cb_font_set), editor);
+
+    GtkWidget *word_wrap = gtk_check_button_new_with_label ("Word Wrap");
+    gtk_box_pack_start (GTK_BOX (popover_box), word_wrap, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (word_wrap), "toggled",
+                      G_CALLBACK (cb_word_wrap), editor);
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (word_wrap), TRUE);
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (editor->text_view), GTK_WRAP_WORD);
 
     // Divider
     GtkWidget *div1 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
@@ -441,9 +480,55 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
     gtk_container_add (GTK_CONTAINER (popover), popover_box);
 }
 
+// Essentially 'continues' from bl_editor_init, but only after the
+// editor instance has been initialised.
+static void cb_on_realise(BlEditor* self)
+{
+    // Parameter sanity checks
+    g_return_if_fail (BL_IS_EDITOR(self));
+
+    // We've created a new BlEditor instance, so let's register
+    // it with the BlMultiEditor singleton. This keeps track of
+    // editor instances for us.
+    GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(self));
+
+    // Check that the window is real and usable
+    g_assert(BLUEDIT_IS_WINDOW(window));
+
+    // Get the multi editor singleton
+    GObject* multi = bluedit_window_get_multi(BLUEDIT_WINDOW(window));
+    self->multi = BL_MULTI_EDITOR(multi);
+
+    // Check multi-editor
+    g_assert(BL_IS_MULTI_EDITOR (multi));
+
+    // Register this editor instance with the singleton
+    bl_multi_editor_register (BL_MULTI_EDITOR(multi), self);
+
+    // Drag and Drop
+    GtkTargetList *list = gtk_target_list_new (NULL, 0);
+    gtk_target_list_add (list, gdk_atom_intern_static_string ("BL_DOCUMENT"),
+                         GTK_TARGET_SAME_APP, BL_TARGET_DOC);
+    /*gtk_target_list_add (list, gdk_atom_intern_static_string ("text/uri-list"),
+                         0, BL_TARGET_URI);
+    gtk_target_list_add (list, gdk_atom_intern_static_string ("text/plain"),
+                         0, BL_TARGET_TEXT);*/
+
+
+    gtk_drag_dest_set(GTK_WIDGET(self), GTK_DEST_DEFAULT_ALL,
+                      NULL, 0, GDK_ACTION_COPY);
+    gtk_drag_dest_set_target_list (GTK_WIDGET (self), list);
+
+    g_signal_connect(G_OBJECT(self), "drag-data-received",
+                     G_CALLBACK(cb_drag_data), NULL);
+}
+
 static void
 bl_editor_init (BlEditor* self)
 {
+    // Set saved
+    self->saved = TRUE;
+
     // Stack
     GtkWidget* stack = gtk_stack_new();
     bl_view_set_contents (BL_VIEW(self), stack);
@@ -484,6 +569,12 @@ bl_editor_init (BlEditor* self)
     GtkWidget *file_label = gtk_label_new ("No Open Files");
     gtk_box_pack_start (GTK_BOX (header_widget), file_label, FALSE, FALSE, 0);
 
+    // Large black dot for indicating 'unsaved changes'
+    GtkWidget *save_status = gtk_label_new ("•");
+    helper_set_widget_css_class (save_status, "save-status");
+    gtk_box_pack_start (GTK_BOX (header_widget),
+                        save_status, FALSE, FALSE, 0);
+
     GtkWidget *prop_button = gtk_toggle_button_new ();
     GtkWidget *menu_icon = gtk_image_new_from_icon_name ("open-menu-symbolic", GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (prop_button), menu_icon);
@@ -501,7 +592,9 @@ bl_editor_init (BlEditor* self)
     setup_popover (self, GTK_POPOVER(popover));
 
     gtk_widget_show_all (header_widget);
+    gtk_widget_hide (save_status);
     self->file_label = GTK_LABEL (file_label);
+    self->save_status = GTK_LABEL (save_status);
 
     // Rest of the initialisation is in the function `cb_on_realise`
     // as we need the widget to have been realised to get the toplevel

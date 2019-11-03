@@ -7,6 +7,8 @@ libsplit_deps = [
 
 incdir = include_directories('include')
 
+add_project_arguments('-DG_LOG_DOMAIN="libsplit"', language : 'c')
+
 libsplit = shared_library('split',
   'spl-tile-manager.c',
   'gtk/spl-workspace.c',

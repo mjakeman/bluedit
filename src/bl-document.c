@@ -25,11 +25,13 @@ struct _BlDocument
     GtkTextBuffer parent_instance;
     GFile* file;
     gboolean untitled;
+    guint hash;
 };
 
 G_DEFINE_TYPE (BlDocument, bl_document, GTK_TYPE_TEXT_BUFFER)
 
-static void helper_set_file(BlDocument* document, GFile* file)
+void
+bl_document_set_file (BlDocument* document, GFile* file)
 {
     // Load from buffer
     gchar *contents;
@@ -43,25 +45,63 @@ static void helper_set_file(BlDocument* document, GFile* file)
 
     if (g_file_load_contents (file, NULL, &contents, &length, NULL, NULL))
     {
-        gtk_text_buffer_set_text (GTK_TEXT_BUFFER(document), contents, length);
+        gtk_text_buffer_set_text (GTK_TEXT_BUFFER (document), contents, length);
         g_free (contents);
     }
 
     document->file = file;
+    document->untitled = FALSE;
+}
+
+BlDocument* bl_document_new ()
+{
+    BlDocument* doc = BL_DOCUMENT(g_object_new(BL_TYPE_DOCUMENT, NULL));
+    return doc;
 }
 
 BlDocument* bl_document_new_from_file(GFile* file)
 {
     g_assert(G_IS_FILE(file));
-    GObject* doc = g_object_new(BL_TYPE_DOCUMENT, NULL);
-    helper_set_file(BL_DOCUMENT(doc), file);
+    BlDocument *doc = bl_document_new();
+    bl_document_set_file (BL_DOCUMENT(doc), file);
+    doc->untitled = FALSE;
+    bl_document_update_save_hash (doc);
     // TODO: set file as a property so it can be loaded in initialisation
 
     return BL_DOCUMENT(doc);
 }
 
+BlDocument* bl_document_new_untitled ()
+{
+    BlDocument* doc = bl_document_new ();
+    doc->untitled = TRUE;
+    bl_document_update_save_hash (doc);
+    return doc;
+}
+
+static void
+bl_document_finalize (GObject *object)
+{
+    G_OBJECT_CLASS (bl_document_parent_class)->finalize (object);
+}
+
+static void
+bl_document_class_init (BlDocumentClass *klass)
+{
+    GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+    object_class->finalize = bl_document_finalize;
+}
+
+gboolean bl_document_is_untitled (BlDocument* doc)
+{
+    return doc->untitled;
+}
+
 gchar* bl_document_get_basename(BlDocument* doc)
 {
+    if (doc->untitled)
+        return "Untitled Document";
     GFile* file = bl_document_get_file(doc);
     return g_file_get_basename (file);
 }
@@ -70,9 +110,9 @@ gchar* bl_document_get_contents(BlDocument* doc)
 {
     GtkTextIter start;
     GtkTextIter end;
-    gtk_text_buffer_get_start_iter (GTK_TEXT_BUFFER(doc), &start);
-    gtk_text_buffer_get_end_iter (GTK_TEXT_BUFFER(doc), &end);
-    return gtk_text_buffer_get_text(GTK_TEXT_BUFFER(doc), &start, &end, TRUE);
+    gtk_text_buffer_get_start_iter (GTK_TEXT_BUFFER (doc), &start);
+    gtk_text_buffer_get_end_iter (GTK_TEXT_BUFFER (doc), &end);
+    return gtk_text_buffer_get_text (GTK_TEXT_BUFFER (doc), &start, &end, TRUE);
 }
 
 GFile* bl_document_get_file(BlDocument* doc)
@@ -80,7 +120,7 @@ GFile* bl_document_get_file(BlDocument* doc)
     g_assert(BL_IS_DOCUMENT (doc));
 
     GFile* file = doc->file;
-    if (file == NULL)
+    if (doc->untitled)
     {
         g_debug("File has not been initialised");
         return NULL;
@@ -92,25 +132,19 @@ gchar* bl_document_get_uri (BlDocument *doc)
 {
     g_assert(BL_IS_DOCUMENT (doc));
 
-    GFile* file = doc->file;
-    if (file == NULL)
+    if (doc->untitled == FALSE)
     {
-        g_debug("File has not been initialised");
-        return NULL;
+        GFile* file = doc->file;
+        return g_file_get_uri (file);
     }
-    return g_file_get_uri (file);
+
+    g_debug("File has not been initialised");
+    return NULL;
 }
 
-GtkTextBuffer* bl_document_get_buffer(BlDocument* doc)
+GtkTextBuffer* bl_document_get_buffer (BlDocument* doc)
 {
-    g_assert(BL_IS_DOCUMENT (doc));
-    return GTK_TEXT_BUFFER(doc);
-}
-
-static void
-bl_document_class_init(BlDocumentClass* klass)
-{
-
+    return GTK_TEXT_BUFFER (doc);
 }
 
 static void
@@ -120,4 +154,45 @@ bl_document_init(BlDocument* self)
     // TODO: Load contents from file here
     // when the initial property is set
     // Currently done in `helper_set_file`
+}
+
+guint bl_document_get_current_hash (BlDocument *self)
+{
+    GtkTextIter start;
+    GtkTextIter end;
+    gtk_text_buffer_get_start_iter (GTK_TEXT_BUFFER (self), &start);
+    gtk_text_buffer_get_end_iter (GTK_TEXT_BUFFER (self), &end);
+
+    // Get text from GtkTextBuffer
+    gchar* text;
+    text = gtk_text_buffer_get_text (GTK_TEXT_BUFFER (self), &start, &end, FALSE);
+
+    GString *str = g_string_new(text);
+    return g_string_hash (str);
+}
+
+guint bl_document_get_save_hash (BlDocument *self)
+{
+    return self->hash;
+}
+
+void bl_document_set_save_hash (BlDocument *self, guint cmp)
+{
+    self->hash = cmp;
+}
+
+gboolean bl_document_unsaved_changes (BlDocument *self)
+{
+    guint current = bl_document_get_current_hash (self);
+    guint saved = bl_document_get_save_hash (self);
+
+    if (current == saved)
+        return FALSE;
+    else
+        return TRUE;
+}
+
+void bl_document_update_save_hash (BlDocument *self)
+{
+    self->hash = bl_document_get_current_hash (self);
 }
