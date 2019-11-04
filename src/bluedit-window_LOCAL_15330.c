@@ -231,20 +231,13 @@ action_save_document (BlueditWindow *self)
 }
 
 static void
-<<<<<<< HEAD
 action_new_document (BlueditWindow *self)
 {
-=======
-cb_new_file (GtkButton* button, BlueditWindow* self)
-{
-    g_debug ("Creating new file");
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
     BlDocument *doc = bluedit_window_new_document (self);
     BlMultiEditor *multi = bluedit_window_get_multi (self);
     bl_multi_editor_open (multi, doc);
 }
 
-<<<<<<< HEAD
 static void
 cb_save_active(GtkButton* button, BlueditWindow* self)
 {
@@ -257,8 +250,6 @@ cb_new_file (GtkButton* button, BlueditWindow* self)
     action_new_document (self);
 }
 
-=======
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 GList* bluedit_window_get_open_documents (BlueditWindow* window)
 {
     return window->open_documents;
@@ -379,10 +370,6 @@ cb_close_window (GtkWidget *widget,
         GtkWidget *close_btn = gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Discard Changes", GTK_RESPONSE_CLOSE);
         gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Cancel", GTK_RESPONSE_CANCEL);
         gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Save", GTK_RESPONSE_OK);
-<<<<<<< HEAD
-=======
-        gtk_dialog_set_default_response (GTK_DIALOG (dialogue), GTK_RESPONSE_CANCEL);
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
         helper_set_widget_css_class (close_btn, "destructive-action");
 
         int result = gtk_dialog_run (GTK_DIALOG (dialogue));
@@ -390,7 +377,6 @@ cb_close_window (GtkWidget *widget,
 
         switch (result)
         {
-<<<<<<< HEAD
             case GTK_RESPONSE_CANCEL:
                 return TRUE;
                 break;
@@ -398,29 +384,10 @@ cb_close_window (GtkWidget *widget,
             case GTK_RESPONSE_OK:
                 return TRUE;
                 break;
-=======
-            case GTK_RESPONSE_OK:
-            {
-                // Save the files
-                if (length == 1)
-                {
-                }
-                return TRUE;
-                break;
-            }
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 
             case GTK_RESPONSE_CLOSE:
                 return FALSE;
                 break;
-<<<<<<< HEAD
-=======
-
-            default:
-            case GTK_RESPONSE_CANCEL:
-                return TRUE;
-                break;
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
         }
     }
 
@@ -526,7 +493,6 @@ static void cb_drag_data_get (GtkTreeView      *view,
                                     sizeof (gpointer));
         }
     }
-<<<<<<< HEAD
 }
 
 static gboolean
@@ -582,8 +548,6 @@ setup_accelerators (BlueditWindow *self)
                              GDK_CONTROL_MASK, 0, open_closure);
     gtk_window_add_accel_group (GTK_WINDOW (self), group);
 
-=======
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 }
 
 static void
