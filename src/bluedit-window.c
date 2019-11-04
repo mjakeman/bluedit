@@ -187,14 +187,17 @@ void bluedit_window_close_document (BlueditWindow* window, BlDocument* document)
 }
 
 static void
-action_open_document (BlueditWindow *self)
+cb_run_open_dialogue(GtkButton *button, BlueditWindow *window)
 {
+    // We don't need GtkButton, this can be NULL
+    g_assert(BLUEDIT_IS_WINDOW(window));
+
     GtkWidget *dialogue;
     GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
     gint result;
 
     dialogue = gtk_file_chooser_dialog_new("Open File",
-                                           GTK_WINDOW(self), action,
+                                           GTK_WINDOW(window), action,
                                            "Cancel", GTK_RESPONSE_CANCEL,
                                            "Open", GTK_RESPONSE_ACCEPT,
                                            NULL);
@@ -206,7 +209,7 @@ action_open_document (BlueditWindow *self)
         GtkFileChooser *chooser = GTK_FILE_CHOOSER(dialogue);
         path = gtk_file_chooser_get_filename(chooser);
         GFile *file = g_file_new_for_path (path);
-        bluedit_window_open_document_from_file (self, file);
+        bluedit_window_open_document_from_file (window, file);
         g_free(path);
     }
 
@@ -214,16 +217,7 @@ action_open_document (BlueditWindow *self)
 }
 
 static void
-cb_run_open_dialogue(GtkButton *button, BlueditWindow *window)
-{
-    // We don't need GtkButton, this can be NULL
-    g_assert(BLUEDIT_IS_WINDOW(window));
-
-    action_open_document (window);
-}
-
-static void
-action_save_document (BlueditWindow *self)
+cb_save_active(GtkButton* button, BlueditWindow* self)
 {
     BlMultiEditor* multi = BL_MULTI_EDITOR (bluedit_window_get_multi (self));
     BlEditor *editor = bl_multi_get_active_editor (multi);
@@ -231,34 +225,14 @@ action_save_document (BlueditWindow *self)
 }
 
 static void
-<<<<<<< HEAD
-action_new_document (BlueditWindow *self)
-{
-=======
 cb_new_file (GtkButton* button, BlueditWindow* self)
 {
     g_debug ("Creating new file");
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
     BlDocument *doc = bluedit_window_new_document (self);
     BlMultiEditor *multi = bluedit_window_get_multi (self);
     bl_multi_editor_open (multi, doc);
 }
 
-<<<<<<< HEAD
-static void
-cb_save_active(GtkButton* button, BlueditWindow* self)
-{
-    action_save_document (self);
-}
-
-static void
-cb_new_file (GtkButton* button, BlueditWindow* self)
-{
-    action_new_document (self);
-}
-
-=======
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 GList* bluedit_window_get_open_documents (BlueditWindow* window)
 {
     return window->open_documents;
@@ -379,10 +353,7 @@ cb_close_window (GtkWidget *widget,
         GtkWidget *close_btn = gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Discard Changes", GTK_RESPONSE_CLOSE);
         gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Cancel", GTK_RESPONSE_CANCEL);
         gtk_dialog_add_button (GTK_DIALOG (dialogue), "_Save", GTK_RESPONSE_OK);
-<<<<<<< HEAD
-=======
         gtk_dialog_set_default_response (GTK_DIALOG (dialogue), GTK_RESPONSE_CANCEL);
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
         helper_set_widget_css_class (close_btn, "destructive-action");
 
         int result = gtk_dialog_run (GTK_DIALOG (dialogue));
@@ -390,15 +361,6 @@ cb_close_window (GtkWidget *widget,
 
         switch (result)
         {
-<<<<<<< HEAD
-            case GTK_RESPONSE_CANCEL:
-                return TRUE;
-                break;
-
-            case GTK_RESPONSE_OK:
-                return TRUE;
-                break;
-=======
             case GTK_RESPONSE_OK:
             {
                 // Save the files
@@ -408,19 +370,15 @@ cb_close_window (GtkWidget *widget,
                 return TRUE;
                 break;
             }
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 
             case GTK_RESPONSE_CLOSE:
                 return FALSE;
                 break;
-<<<<<<< HEAD
-=======
 
             default:
             case GTK_RESPONSE_CANCEL:
                 return TRUE;
                 break;
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
         }
     }
 
@@ -526,64 +484,6 @@ static void cb_drag_data_get (GtkTreeView      *view,
                                     sizeof (gpointer));
         }
     }
-<<<<<<< HEAD
-}
-
-static gboolean
-cb_accel_save (GtkAccelGroup   *group,
-               GObject         *acceleratable,
-               guint            keyval,
-               GdkModifierType  modifier)
-{
-    // Ctrl + S has been pressed
-    BlueditWindow *window = BLUEDIT_WINDOW (acceleratable);
-    action_save_document (window);
-    return FALSE;
-}
-
-static gboolean
-cb_accel_new (GtkAccelGroup   *group,
-              GObject         *acceleratable,
-              guint            keyval,
-              GdkModifierType  modifier)
-{
-    // Ctrl + N has been pressed
-    BlueditWindow *window = BLUEDIT_WINDOW (acceleratable);
-    action_new_document (window);
-    return FALSE;
-}
-
-static gboolean
-cb_accel_open (GtkAccelGroup   *group,
-              GObject         *acceleratable,
-              guint            keyval,
-              GdkModifierType  modifier)
-{
-    // Ctrl + N has been pressed
-    BlueditWindow *window = BLUEDIT_WINDOW (acceleratable);
-    action_open_document (window);
-    return FALSE;
-}
-
-static void
-setup_accelerators (BlueditWindow *self)
-{
-    // TODO: Refactor this into using GActions
-    // and maybe a BlAccelerator class?
-    GtkAccelGroup *group = gtk_accel_group_new ();
-    GClosure *save_closure = g_cclosure_new ((GCallback)cb_accel_save, NULL, NULL);
-    GClosure *new_closure = g_cclosure_new ((GCallback)cb_accel_new, NULL, NULL);
-    GClosure *open_closure = g_cclosure_new ((GCallback)cb_accel_open, NULL, NULL);
-    gtk_accel_group_connect (group, gdk_keyval_from_name ("S"),
-                             GDK_CONTROL_MASK, 0, save_closure);
-    gtk_accel_group_connect (group, gdk_keyval_from_name ("N"),
-                             GDK_CONTROL_MASK, 0, new_closure);
-    gtk_accel_group_connect (group, gdk_keyval_from_name ("O"),
-                             GDK_CONTROL_MASK, 0, open_closure);
-    gtk_window_add_accel_group (GTK_WINDOW (self), group);
-
-=======
->>>>>>> b29900ae650fce8be6e81c68476a76d1ca76674c
 }
 
 static void
@@ -683,9 +583,6 @@ bluedit_window_init (BlueditWindow *self)
     GdkScreen *screen = gdk_display_get_default_screen (display);
     gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_css_provider_load_from_resource(GTK_CSS_PROVIDER(provider),"/com/mattjakeman/bluedit/style.css");
-
-    // Keyboard Shortcuts
-    setup_accelerators (self);
 
     // Add to dual panel
     gtk_paned_add1 (GTK_PANED(paned), sidebar);
