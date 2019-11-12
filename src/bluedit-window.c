@@ -23,6 +23,11 @@
 #include "bl-multi-editor.h"
 #include "views/bl-editor.h"
 #include "views/bl-view.h"
+#include "bl-preferences.h"
+
+// Libhandy
+#define HANDY_USE_UNSTABLE_API
+#include <handy.h>
 
 struct _BlueditWindow
 {
@@ -38,6 +43,8 @@ struct _BlueditWindow
     GtkButton*          open_btn;
     GtkButton*          save_btn;
     GtkButton*          new_btn;
+    GtkMenuButton*      menu_btn;
+    GtkPopover*         popover;
 };
 
 G_DEFINE_TYPE (BlueditWindow, bluedit_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -46,6 +53,7 @@ enum
 {
 	DOC_ADDED,
     DOC_CLOSED,
+    PREFS_CHANGED,
 	LAST_SIGNAL
 };
 
@@ -62,6 +70,8 @@ bluedit_window_class_init (BlueditWindowClass *klass)
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, open_btn);
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, save_btn);
     gtk_widget_class_bind_template_child (widget_class, BlueditWindow, new_btn);
+    gtk_widget_class_bind_template_child (widget_class, BlueditWindow, menu_btn);
+    gtk_widget_class_bind_template_child (widget_class, BlueditWindow, popover);
 
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
@@ -79,6 +89,18 @@ bluedit_window_class_init (BlueditWindowClass *klass)
 
     signals[DOC_CLOSED] =
         g_signal_newv ("doc-closed",
+                 G_TYPE_FROM_CLASS (object_class),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* closure */,
+                 NULL /* accumulator */,
+                 NULL /* accumulator data */,
+                 NULL /* C marshaller */,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
+
+    signals[PREFS_CHANGED] =
+        g_signal_newv ("prefs-changed",
                  G_TYPE_FROM_CLASS (object_class),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
                  NULL /* closure */,
@@ -175,6 +197,13 @@ BlDocument* bluedit_window_open_document_from_file (BlueditWindow* window, GFile
 
 void bluedit_window_close_document (BlueditWindow* window, BlDocument* document)
 {
+    // Prompt Save
+    if (bl_document_unsaved_changes (document))
+    {
+        // FIXME: Prompt Save
+        g_critical ("Unsaved file closed!");
+    }
+
     window->open_documents = g_list_remove(window->open_documents, document);
 
     g_debug("Closed File");
@@ -553,6 +582,35 @@ setup_accelerators (BlueditWindow *self)
 }
 
 static void
+cb_prefs_changed (BlPreferences *prefs,
+                  BlueditWindow *window)
+{
+    g_debug ("Prefs Changed");
+    g_signal_emit (G_OBJECT (window), signals[PREFS_CHANGED], 0);
+}
+
+static void
+action_prefs (GSimpleAction *action,
+              GVariant      *null_ptr,
+              BlueditWindow *window)
+{
+    BlPreferences* prefs = bl_preferences_new ();
+
+    g_signal_connect (G_OBJECT(prefs), "changed",
+                      G_CALLBACK(cb_prefs_changed), window);
+
+    gtk_window_present (GTK_WINDOW (prefs));
+}
+
+static void
+setup_actions (BlueditWindow *self)
+{
+    GSimpleAction *prefs = g_simple_action_new ("prefs", NULL);
+    g_signal_connect (prefs, "activate", (GCallback)action_prefs, self);
+    g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (prefs));
+}
+
+static void
 bluedit_window_init (BlueditWindow *self)
 {
     // Init template
@@ -588,6 +646,10 @@ bluedit_window_init (BlueditWindow *self)
     // Bind on delete signal
     g_signal_connect(G_OBJECT(self), "delete-event",
                      G_CALLBACK(cb_close_window), NULL);
+
+    // Popover
+    gtk_menu_button_set_popover (self->menu_btn, GTK_WIDGET (self->popover));
+    helper_set_widget_css_class (GTK_WIDGET (self->popover), "popover");
 
     // Create GUI
     GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
@@ -649,6 +711,9 @@ bluedit_window_init (BlueditWindow *self)
     GdkScreen *screen = gdk_display_get_default_screen (display);
     gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_css_provider_load_from_resource(GTK_CSS_PROVIDER(provider),"/com/mattjakeman/bluedit/style.css");
+
+    // Actions
+    setup_actions (self);
 
     // Keyboard Shortcuts
     setup_accelerators (self);

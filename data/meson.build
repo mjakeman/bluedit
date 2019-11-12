@@ -1,3 +1,11 @@
+# Icons
+install_data('builder-view-bottom-pane-symbolic.svg',
+  install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', 'symbolic', 'apps'),
+)
+install_data('builder-view-right-pane-symbolic.svg',
+  install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', 'symbolic', 'apps'),
+)
+
 desktop_file = i18n.merge_file(
   input: 'com.mattjakeman.bluedit.desktop.in',
   output: 'com.mattjakeman.bluedit.desktop',

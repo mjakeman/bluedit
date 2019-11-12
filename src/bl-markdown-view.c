@@ -24,8 +24,9 @@
 struct _BlMarkdownView
 {
     GtkTextView parent_instance;
-    GtkTextTag *font_tag;
-    PangoFontDescription *font;
+    GtkTextTag *user_style_tag;
+    GVariant *font;
+    gdouble spacing;
 };
 
 G_DEFINE_TYPE(BlMarkdownView, bl_markdown_view, GTK_TYPE_TEXT_VIEW);
@@ -95,21 +96,53 @@ apply_tag(GtkTextBuffer   *buffer,
 }
 
 static void
-update_font (BlMarkdownView *self)
+update_style (BlMarkdownView *self)
 {
     if (self->font)
     {
-        g_object_set (G_OBJECT (self->font_tag),
-                  "font-desc", self->font,
+        g_debug ("Updating Font");
+        g_object_set (G_OBJECT (self->user_style_tag),
+                  "font", g_variant_get_string (self->font, NULL),
                   NULL);
     }
+
+    // Set Font Metrics
+    PangoFontDescription *desc;
+    g_object_get (G_OBJECT (self->user_style_tag), "font-desc", &desc, NULL);
+
+    if (desc == NULL)
+    {
+        desc = pango_font_description_new ();
+        g_object_set (G_OBJECT (self->user_style_tag), "font-desc", desc, NULL);
+    }
+
+    // Get Font Size
+    gdouble size = pango_font_description_get_size (desc);
+
+    // Apply Line Spacing
+    // TODO: pango_font_description_set_
+    g_object_set (G_OBJECT (self->user_style_tag),
+                  "rise", (gint)(self->spacing * size),
+                  NULL);
+
+    // Apply Paragraph Spacing
+    /*g_object_set (G_OBJECT (self->user_style_tag),
+              "pixels-below-lines", (gint)(self->spacing * size),
+              NULL);*/
 }
 
 void
-bl_markdown_view_set_font (BlMarkdownView *self, PangoFontDescription *font)
+bl_markdown_view_set_font (BlMarkdownView *self, const gchar *font_name)
 {
-    self->font = font;
-    update_font (self);
+    self->font = g_variant_new_string (font_name);
+    update_style (self);
+}
+
+void
+bl_markdown_view_set_line_spacing (BlMarkdownView *self, gdouble line_spacing)
+{
+    self->spacing = line_spacing;
+    update_style (self);
 }
 
 static void
@@ -197,7 +230,7 @@ highlight_buffer (GtkTextBuffer* buffer, BlMarkdownView* self)
     }
 
     // Update font tag
-    gtk_text_buffer_apply_tag (buffer, self->font_tag, &start, &end);
+    gtk_text_buffer_apply_tag (buffer, self->user_style_tag, &start, &end);
 
     g_debug("\n\n");
 }
@@ -266,15 +299,16 @@ initialise_buffer (BlMarkdownView* self)
                                    NULL);
 
         // Tag: Widget Font Styling
-        self->font_tag =
-            gtk_text_buffer_create_tag (buffer, "user-style", NULL);
+        self->user_style_tag =
+            gtk_text_buffer_create_tag (buffer, "user-style",
+                                        NULL);
 
-        gtk_text_tag_set_priority (self->font_tag, 0);
+        gtk_text_tag_set_priority (self->user_style_tag, 0);
     }
 
-    self->font_tag = gtk_text_tag_table_lookup (tag_table, "user-style");
+    self->user_style_tag = gtk_text_tag_table_lookup (tag_table, "user-style");
 
-    update_font (self);
+    update_style (self);
 
     highlight_buffer(buffer, self);
 
@@ -298,5 +332,10 @@ bl_markdown_view_class_init (BlMarkdownViewClass* klass)
 static void
 bl_markdown_view_init (BlMarkdownView* self)
 {
+    GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
+    gtk_style_context_add_class (context, "text-view");
     initialise_buffer (self);
+
+    // Default Value
+    self->spacing = 0;
 }

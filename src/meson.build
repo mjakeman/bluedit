@@ -6,13 +6,15 @@ bluedit_sources = [
   'bl-document.c',
   'bl-markdown-view.c',
   'bl-workspace.c',
-  'views/bl-view.c'
+  'views/bl-view.c',
+  'bl-preferences.c'
 ]
 
 bluedit_deps = [
   dependency('gio-2.0', version: '>= 2.50'),
   dependency('gtk+-3.0', version: '>= 3.22'),
   dependency('libcmark'),
+  dependency('libhandy-0.0', version: '>= 0.0.10'),
   libsplit_dep # defined in top level meson.build
 ]
 
