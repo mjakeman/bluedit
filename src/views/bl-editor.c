@@ -131,6 +131,10 @@ void bl_editor_save_file_as (BlEditor *editor)
     if (doc == NULL)
         return;
 
+    gboolean untitled = FALSE;
+    if (bl_document_is_untitled (doc))
+        untitled = TRUE;
+
     GtkWidget *dialogue;
     GtkFileChooser *chooser;
     GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_SAVE;
@@ -155,7 +159,16 @@ void bl_editor_save_file_as (BlEditor *editor)
         gchar* contents = bl_document_get_contents(doc);
         gint len = strlen(contents);
         g_file_replace_contents (file, contents, len, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, NULL);
-        editor->document = bluedit_window_open_document_from_file (BLUEDIT_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET (editor))), file);
+
+        BlueditWindow *window = BLUEDIT_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET (editor)));
+
+        // If untitled, close old file
+        if (untitled)
+            bluedit_window_close_document (window, editor->document);
+
+        // Then load new file
+        BlDocument *new_doc = bluedit_window_open_document_from_file (window, file);
+        bl_editor_load_file (editor, new_doc);
 
         g_free (filename);
     }
@@ -248,7 +261,7 @@ void bl_editor_save_file (BlEditor *editor)
 
 // Close the active editor, unset self->document
 // It does *not* close the file from the whole programme,
-// which is the responsiblity of the caller
+// which is the responsiblity of the caller.
 void bl_editor_close_file (BlEditor *self)
 {
     // TODO: Load another file instead of closing?
@@ -257,6 +270,7 @@ void bl_editor_close_file (BlEditor *self)
     bl_view_remove_decoration_style (BL_VIEW (self), "active-editor");
     self->document = NULL;
     self->saved = TRUE;
+    update_save_label (NULL, self);
 }
 
 static void
@@ -379,13 +393,6 @@ cb_popover_closed (GtkPopover *popover, GtkToggleButton *btn)
 }
 
 static void
-cb_font_set (GtkFontButton *btn, BlEditor *self)
-{
-    PangoFontDescription *font = gtk_font_chooser_get_font_desc (GTK_FONT_CHOOSER (btn));
-    bl_markdown_view_set_font (self->text_view, font);
-}
-
-static void
 cb_save (GtkButton *btn, BlEditor *self)
 {
     bl_editor_save_file (self);
@@ -395,16 +402,6 @@ static void
 cb_save_as (GtkButton *btn, BlEditor *self)
 {
     bl_editor_save_file_as (self);
-}
-
-static void
-cb_word_wrap (GtkToggleButton *btn, BlEditor *self)
-{
-    gboolean state = gtk_toggle_button_get_active (btn);
-    if (state)
-        gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (self->text_view), GTK_WRAP_WORD);
-    else
-        gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (self->text_view), GTK_WRAP_NONE);
 }
 
 static void
@@ -426,7 +423,7 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
 {
     // Popover Menu Box
     GtkWidget *popover_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-    helper_set_widget_css_class (popover_box, "bl-editor-popover");
+    helper_set_widget_css_class (popover_box, "popover");
 
     // Title ("Document")
     GtkWidget *label = gtk_label_new ("Document");
@@ -435,7 +432,7 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
     gtk_box_pack_start (GTK_BOX (popover_box), label, FALSE, FALSE, 0);
 
     // Font Styles
-    GtkWidget *font_btn = gtk_font_button_new ();
+    /*GtkWidget *font_btn = gtk_font_button_new ();
     gtk_box_pack_start (GTK_BOX (popover_box), font_btn, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (font_btn), "font-set",
                       G_CALLBACK (cb_font_set), editor);
@@ -450,7 +447,7 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
 
     // Divider
     GtkWidget *div1 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_pack_start (GTK_BOX (popover_box), div1, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (popover_box), div1, FALSE, FALSE, 0);*/
 
     // Saving
     GtkWidget *save = gtk_button_new_with_label ("Save");
@@ -478,6 +475,28 @@ setup_popover (BlEditor *editor, GtkPopover *popover)
     gtk_box_pack_start (GTK_BOX (popover_box), close_btn, FALSE, FALSE, 0);
 
     gtk_container_add (GTK_CONTAINER (popover), popover_box);
+}
+
+// Refresh Properties
+static void
+cb_refresh_properties (BlueditWindow *window,
+                       BlEditor *self)
+{
+    g_debug ("Refreshing properties");
+
+    // Settings
+    GSettings *gsettings = g_settings_new ("com.mattjakeman.bluedit");
+
+    // Wrap
+    gboolean wrap = g_variant_get_boolean (g_settings_get_value (gsettings, "word-wrap"));
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (self->text_view), wrap ? GTK_WRAP_WORD : GTK_WRAP_NONE);
+
+    // Font
+    const gchar* font_name = g_variant_get_string (g_settings_get_value (gsettings, "default-font"), NULL);
+    bl_markdown_view_set_font (self->text_view, font_name);
+
+    gdouble spacing = g_variant_get_double (g_settings_get_value (gsettings, "line-spacing"));
+    bl_markdown_view_set_line_spacing (self->text_view, spacing);
 }
 
 // Essentially 'continues' from bl_editor_init, but only after the
@@ -521,6 +540,13 @@ static void cb_on_realise(BlEditor* self)
 
     g_signal_connect(G_OBJECT(self), "drag-data-received",
                      G_CALLBACK(cb_drag_data), NULL);
+
+    // Properties
+    g_signal_connect (G_OBJECT (window), "prefs-changed",
+                      G_CALLBACK (cb_refresh_properties), self);
+
+    // Manually refresh properties to start
+    cb_refresh_properties (BLUEDIT_WINDOW (window), self);
 }
 
 static void

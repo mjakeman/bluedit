@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="bluedit">
 	<schema id="com.mattjakeman.bluedit" path="/com/mattjakeman/bluedit/">
+	  <key name="default-font" type="s">
+      <default>'Serif 12'</default>
+      <summary>Default Font</summary>
+      <description>The default font to be used by the editor.</description>
+    </key>
+	  <key name="line-spacing" type="d">
+      <default>0.5</default>
+      <summary>Line Spacing</summary>
+      <description>The distance between lines in the text editor.</description>
+    </key>
+    <key name="word-wrap" type="b">
+      <default>true</default>
+      <summary>Word Wrap</summary>
+      <description>If the text editor should wrap around with very long lines.</description>
+    </key>
 	</schema>
 </schemalist>

@@ -183,6 +183,9 @@ void bl_document_set_save_hash (BlDocument *self, guint cmp)
 
 gboolean bl_document_unsaved_changes (BlDocument *self)
 {
+    if (self == NULL)
+        return FALSE;
+
     guint current = bl_document_get_current_hash (self);
     guint saved = bl_document_get_save_hash (self);
 

@@ -53,3 +53,22 @@
 .save-status {
     margin: 0 5px;
 }
+
+/* Main Popover Styling */
+.popover {
+    padding: 8px;
+}
+
+/* Text View padding */
+.text-view {
+    padding: 20px;
+}
+
+/* Preferences Styling */
+.bl-prefs-button {
+    margin: 10px;
+}
+
+.bl-prefs-switch {
+    margin: 15px;
+}

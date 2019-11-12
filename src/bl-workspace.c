@@ -101,10 +101,10 @@ cb_new_area (SplWorkspace *workspace, SplArea *area, gpointer null_ptr)
 
     GtkWidget *split_h = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (split_h),
-                          gtk_image_new_from_resource ("/com/mattjakeman/bluedit/builder-view-right-pane-symbolic.svg"));
+                          gtk_image_new_from_icon_name ("builder-view-right-pane-symbolic", GTK_ICON_SIZE_BUTTON));
     GtkWidget *split_v = gtk_button_new ();
     gtk_button_set_image (GTK_BUTTON (split_v),
-                          gtk_image_new_from_resource ("/com/mattjakeman/bluedit/builder-view-bottom-pane-symbolic.svg"));
+                          gtk_image_new_from_icon_name ("builder-view-bottom-pane-symbolic", GTK_ICON_SIZE_BUTTON));
     helper_set_widget_css_class (split_h, "flat");
     helper_set_widget_css_class (split_v, "flat");
 

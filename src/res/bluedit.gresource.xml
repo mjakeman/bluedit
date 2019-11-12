@@ -3,8 +3,7 @@
   <gresource prefix="/com/mattjakeman/bluedit">
     <file>bluedit-window.ui</file>
     <file>style.css</file>
-    <file>builder-view-bottom-pane-symbolic.svg</file>
-    <file>builder-view-right-pane-symbolic.svg</file>
     <file>bluedit.svg</file>
+    <file>preferences.ui</file>
   </gresource>
 </gresources>

@@ -1,4 +1,4 @@
-/* bl-markdown-view.h
+/* bl-preferences.h
  *
  * Copyright 2019 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
@@ -18,14 +18,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#pragma once
+
 #include <gtk/gtk.h>
+#define HANDY_USE_UNSTABLE_API
+#include <handy.h>
+#include "helper.h"
 
 G_BEGIN_DECLS
 
-#define BL_TYPE_MARKDOWN_VIEW (bl_markdown_view_get_type())
-G_DECLARE_FINAL_TYPE(BlMarkdownView, bl_markdown_view, BL, MARKDOWN_VIEW, GtkTextView);
+#define BL_TYPE_PREFERENCES (bl_preferences_get_type())
+G_DECLARE_FINAL_TYPE (BlPreferences, bl_preferences, BL, PREFERENCES, HdyPreferencesWindow)
 
-void bl_markdown_view_set_buffer (BlMarkdownView* self, GtkTextBuffer* buffer);
-void bl_markdown_view_set_font (BlMarkdownView *self, const gchar *font_name);
-void bl_markdown_view_set_line_spacing (BlMarkdownView *self, gdouble line_spacing);
+BlPreferences * bl_preferences_new (void);
+
 G_END_DECLS
