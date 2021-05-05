@@ -5,12 +5,14 @@ upon and cleaned-up for public release.
 
 ![Screenshot](data/bluedit.png)
 
-The current status of this program is that it is functional, however clunky
-and unmaintained. **The project will undergo a complete rewrite in C# in
-order to facilitate the development of modern C# bindings for Gtk**. If you
-would like to contribute, please consider working on
-[GirSharp](https://gitlab.com/littleblue/gir-sharp/) as any support will be
-greatly welcome.
+The current status of this program is that it is functional however
+unmaintained. In the future, this project will undergo a complete rewrite
+in C# in order to facilitate the development of modern C# bindings for Gtk.
+
+**Next generation .NET language bindings for GObject and the GTK stack are in development
+on GitHub as part of the [gir.core](https://github.com/gircore/gir.core) project,
+which I am heavily involved in. Please consider contributing over there, as any
+support will be greatly welcome.**
 
 ## Project Structure
 The source code for the program is in the `/src` subdirectory, while the code
@@ -34,9 +36,9 @@ distribution, or Windows Subsystem for Linux with the required dependencies
 (see below). Note there is no guarantee the program will function as intended
 on WSL, as this is not the intended use case scenario.
 
-**Note:** Windows and macOS support are definitely intended and are coming. The
-above notice is taken from the Project's Submission README, when I didn't have
-time for a Windows Port.
+It is possible to build this project for Windows under a MSYS2/MinGW
+environment. It works largely as expected, although it hasn't been fully
+tested.
 
 ## Building
 ### Flatpak (Recommended)
