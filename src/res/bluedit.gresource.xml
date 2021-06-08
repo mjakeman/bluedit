@@ -6,5 +6,7 @@
     <file>bluedit.svg</file>
     <file>preferences.ui</file>
     <file>bluedit-toolbar.ui</file>
+    <file>builder-view-bottom-pane-symbolic.svg</file>
+    <file>builder-view-right-pane-symbolic.svg</file>
   </gresource>
 </gresources>

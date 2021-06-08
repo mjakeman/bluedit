@@ -2,3 +2,5 @@ build/
 flatpak-build/
 repo/
 .flatpak-builder/
+_build/
+.vscode
