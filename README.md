@@ -5,6 +5,9 @@ iterated on and cleaned-up for public release. Enjoy :)
 
 ![Screenshot](screenshot.png)
 
+## Downloads
+You can download Bluedit for Windows from the [releases page](https://github.com/mjakeman/bluedit/releases/).
+
 ## Project Structure
 The source code for the program is in the `/src` subdirectory, while the code
 for libsplit is in the `/subprojects/libsplit` directory. The program otherwise
