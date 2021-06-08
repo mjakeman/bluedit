@@ -1,18 +1,9 @@
 # Bluedit
-Bluedit is a word processor written in C and Gtk. It was created
-for NCEA Level 3 Digital Technologies AS 91637 and subsequently iterated
-upon and cleaned-up for public release.
+Bluedit is a word processor written in C and Gtk. I created it
+for NCEA Level 3 Digital Technologies AS 91637 and it has been
+iterated on and cleaned-up for public release. Enjoy :)
 
-![Screenshot](data/bluedit.png)
-
-The current status of this program is that it is functional however
-unmaintained. In the future, this project will undergo a complete rewrite
-in C# in order to facilitate the development of modern C# bindings for Gtk.
-
-**Next generation .NET language bindings for GObject and the GTK stack are in development
-on GitHub as part of the [gir.core](https://github.com/gircore/gir.core) project,
-which I am heavily involved in. Please consider contributing over there, as any
-support will be greatly welcome.**
+![Screenshot](screenshot.png)
 
 ## Project Structure
 The source code for the program is in the `/src` subdirectory, while the code
