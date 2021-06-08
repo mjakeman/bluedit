@@ -105,8 +105,8 @@ action_row_with_font_btn (BlPreferences *prefs,
 {
     GtkWidget *font_btn = gtk_font_button_new ();
     HdyActionRow *font = hdy_action_row_new ();
-    hdy_action_row_set_title (font, title);
-    hdy_action_row_add_action (font, font_btn);
+    hdy_preferences_row_set_title (font, title);
+    // hdy_action_row_add_action (font, font_btn);
     hdy_action_row_set_activatable_widget (font, font_btn);
     helper_set_widget_css_class (font_btn, "bl-prefs-button");
 
@@ -157,8 +157,8 @@ action_row_with_spin_btn (BlPreferences *prefs,
 {
     GtkWidget *spin_btn = gtk_spin_button_new_with_range (min, max, step);
     HdyActionRow *spin = hdy_action_row_new ();
-    hdy_action_row_set_title (spin, title);
-    hdy_action_row_add_action (spin, spin_btn);
+    hdy_preferences_row_set_title (spin, title);
+    // hdy_action_row_add_action (spin, spin_btn);
     hdy_action_row_set_activatable_widget (spin, spin_btn);
     helper_set_widget_css_class (spin_btn, "bl-prefs-button");
 
@@ -206,8 +206,8 @@ action_row_with_switch (BlPreferences *prefs,
 {
     GtkWidget *switch_btn = gtk_switch_new ();
     HdyActionRow *switch_row = hdy_action_row_new ();
-    hdy_action_row_set_title (switch_row, title);
-    hdy_action_row_add_action (switch_row, switch_btn);
+    hdy_preferences_row_set_title (switch_row, title);
+    // hdy_action_row_add_action (switch_row, switch_btn);
     hdy_action_row_set_activatable_widget (switch_row, switch_btn);
     helper_set_widget_css_class (switch_btn, "bl-prefs-switch");
 

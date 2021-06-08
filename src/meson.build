@@ -14,7 +14,7 @@ bluedit_deps = [
   dependency('gio-2.0', version: '>= 2.50'),
   dependency('gtk+-3.0', version: '>= 3.22'),
   dependency('libcmark'),
-  dependency('libhandy-0.0', version: '>= 0.0.10'),
+  dependency('libhandy-1'),
   libsplit_dep # defined in top level meson.build
 ]
 
