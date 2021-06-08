@@ -24,6 +24,7 @@
 #include "views/bl-editor.h"
 #include "views/bl-view.h"
 #include "bl-preferences.h"
+#include "bl-toolbar.h"
 
 // Libhandy
 #define HANDY_USE_UNSTABLE_API
@@ -631,16 +632,52 @@ bluedit_window_init (BlueditWindow *self)
     g_signal_connect (G_OBJECT(multi_editor), "focus-changed",
                       G_CALLBACK(cb_focus_changed), self);
 
-    // Bind open file button
-    g_signal_connect(G_OBJECT(self->open_btn), "clicked",
-                     G_CALLBACK(cb_run_open_dialogue), self);
+    // Create GUI
+    GtkWidget* vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
+    GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_end(GTK_BOX(vbox), paned, TRUE, TRUE, 0);
+
+    GSettings *gsettings = g_settings_new ("com.mattjakeman.bluedit");
+    gboolean use_csd = !g_variant_get_boolean (g_settings_get_value (gsettings, "ssd"));
+
+    GtkWidget *open_btn;
+    GtkWidget *save_btn;
+    GtkWidget *new_btn;
+    GtkWidget *menu_btn;
+
+    if (use_csd)
+    {
+        // HeaderBar
+        open_btn = self->open_btn;
+        save_btn = self->save_btn;
+        new_btn = self->new_btn;
+        menu_btn = self->menu_btn;
+    }
+    else
+    {
+        // Create a toolbar
+        GtkWidget* toolbar = bl_toolbar_new ();
+        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+
+        open_btn = BL_TOOLBAR (toolbar)->open_btn;
+        save_btn = BL_TOOLBAR (toolbar)->save_btn;
+        new_btn = BL_TOOLBAR (toolbar)->new_btn;
+        menu_btn = BL_TOOLBAR (toolbar)->menu_btn;
+
+        gtk_window_set_titlebar(GTK_WINDOW (self), NULL);
+    }
+
+    // Bind open file button
+    g_signal_connect(G_OBJECT(open_btn), "clicked",
+                     G_CALLBACK(cb_run_open_dialogue), self);
+    
     // Bind save file button
-    g_signal_connect(G_OBJECT(self->save_btn), "clicked",
+    g_signal_connect(G_OBJECT(save_btn), "clicked",
                      G_CALLBACK(cb_save_active), self);
 
     // Bind new file button
-    g_signal_connect(G_OBJECT(self->new_btn), "clicked",
+    g_signal_connect(G_OBJECT(new_btn), "clicked",
                      G_CALLBACK(cb_new_file), self);
 
     // Bind on delete signal
@@ -648,11 +685,8 @@ bluedit_window_init (BlueditWindow *self)
                      G_CALLBACK(cb_close_window), NULL);
 
     // Popover
-    gtk_menu_button_set_popover (self->menu_btn, GTK_WIDGET (self->popover));
+    gtk_menu_button_set_popover (menu_btn, GTK_WIDGET (self->popover));
     helper_set_widget_css_class (GTK_WIDGET (self->popover), "popover");
-
-    // Create GUI
-    GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
     // Sidebar
     // TODO: This box only has one thing in it
@@ -722,7 +756,7 @@ bluedit_window_init (BlueditWindow *self)
     gtk_paned_add1 (GTK_PANED(paned), sidebar);
     gtk_paned_add2 (GTK_PANED(paned), workspace);
 
-    gtk_container_add(GTK_CONTAINER(self), paned);
+    gtk_container_add(GTK_CONTAINER(self), vbox);
 
     gtk_widget_show_all(GTK_WIDGET(self));
 }

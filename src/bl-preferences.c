@@ -249,13 +249,22 @@ setup_editor_page (BlPreferences *self, GSettings *gsettings)
     gtk_container_add (GTK_CONTAINER (group1), GTK_WIDGET (spacing));
     gtk_container_add (GTK_CONTAINER (group1), GTK_WIDGET (wrap));
 
+    // # System Category
+    HdyPreferencesGroup *group2 = hdy_preferences_group_new ();
+    hdy_preferences_group_set_title (group2, "System");
+    hdy_preferences_group_set_description (group2, "Integration with the operating/windowing system.");
+    
+    HdyActionRow *ssd = action_row_with_switch (self, gsettings, "Use Native Titlebar (Requires Restart)", "ssd");
+
+    gtk_container_add (GTK_CONTAINER (group2), GTK_WIDGET (ssd));
+
 
     // # Themes Category
     // TODO;
 
     // # Add All Categories to Page
     gtk_container_add (GTK_CONTAINER (page), GTK_WIDGET (group1));
-    //gtk_container_add (GTK_CONTAINER (page), GTK_WIDGET (group2));
+    gtk_container_add (GTK_CONTAINER (page), GTK_WIDGET (group2));
 
     gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (page));
 }

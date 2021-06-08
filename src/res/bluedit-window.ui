@@ -61,7 +61,6 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="popover">popover</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>

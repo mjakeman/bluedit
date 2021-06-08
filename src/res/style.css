@@ -72,3 +72,9 @@
 .bl-prefs-switch {
     margin: 15px;
 }
+
+.bl-toolbar {
+    padding: 5px;
+    border-bottom: 1px solid black;
+    background-color: white;
+}

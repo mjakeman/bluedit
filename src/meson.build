@@ -7,7 +7,8 @@ bluedit_sources = [
   'bl-markdown-view.c',
   'bl-workspace.c',
   'views/bl-view.c',
-  'bl-preferences.c'
+  'bl-preferences.c',
+  'bl-toolbar.c'
 ]
 
 bluedit_deps = [

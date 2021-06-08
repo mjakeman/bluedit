@@ -16,5 +16,10 @@
       <summary>Word Wrap</summary>
       <description>If the text editor should wrap around with very long lines.</description>
     </key>
+    <key name="ssd" type="b">
+      <default>true</default>
+      <summary>Use Native Titlebars</summary>
+      <description>Should Server Side Decorations be used (requires restart)</description>
+    </key>
 	</schema>
 </schemalist>
