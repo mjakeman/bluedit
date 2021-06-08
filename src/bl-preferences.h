@@ -28,7 +28,7 @@
 G_BEGIN_DECLS
 
 #define BL_TYPE_PREFERENCES (bl_preferences_get_type())
-G_DECLARE_FINAL_TYPE (BlPreferences, bl_preferences, BL, PREFERENCES, HdyPreferencesWindow)
+G_DECLARE_FINAL_TYPE (BlPreferences, bl_preferences, BL, PREFERENCES, GtkWindow)
 
 BlPreferences * bl_preferences_new (void);
 

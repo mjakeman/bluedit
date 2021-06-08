@@ -1,5 +1,5 @@
 # Bluedit
-Bluedit is a word processor written in C and Gtk. I created it
+Bluedit (pronounced 'blue-edit') is a word processor written in C and Gtk. I created it
 for NCEA Level 3 Digital Technologies AS 91637 and it has been
 iterated on and cleaned-up for public release. Enjoy :)
 
@@ -28,8 +28,7 @@ distribution, or Windows Subsystem for Linux with the required dependencies
 on WSL, as this is not the intended use case scenario.
 
 It is possible to build this project for Windows under a MSYS2/MinGW
-environment. It works largely as expected, although it hasn't been fully
-tested.
+environment. Follow the steps listed below (under 'Meson').
 
 ## Building
 ### Flatpak (Recommended)
