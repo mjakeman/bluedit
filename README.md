@@ -24,17 +24,12 @@ The main features of the program are:
  - Changing and configuring the font
  
 ## Running the Program
-This program is designed for Linux, and this is the intended environment
-for the program. In order to run, please make sure you are running a linux
-distribution, or Windows Subsystem for Linux with the required dependencies
-(see below). Note there is no guarantee the program will function as intended
-on WSL, as this is not the intended use case scenario.
-
-It is possible to build this project for Windows under a MSYS2/MinGW
-environment. Follow the steps listed below (under 'Meson').
+Bluedit has been designed to run on Windows and Linux. Windows binaries are available from the
+releases page, whereas for Linux (and also MacOS), the program will need to be built
+manually. Building instructions are as follows:
 
 ## Building
-### Flatpak (Recommended)
+### Flatpak (Recommended for Linux)
 The easiest way to build the program is to open it with GNOME Builder
 and allow it to download the required SDKs for you. Alternatively, you
 could build it directly with the flatpak command line tool:
