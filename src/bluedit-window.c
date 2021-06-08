@@ -219,17 +219,15 @@ void bluedit_window_close_document (BlueditWindow* window, BlDocument* document)
 static void
 action_open_document (BlueditWindow *self)
 {
-    GtkWidget *dialogue;
+    GtkFileChooserNative *dialogue;
     GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
     gint result;
 
-    dialogue = gtk_file_chooser_dialog_new("Open File",
+    dialogue = gtk_file_chooser_native_new ("Open File",
                                            GTK_WINDOW(self), action,
-                                           "Cancel", GTK_RESPONSE_CANCEL,
-                                           "Open", GTK_RESPONSE_ACCEPT,
-                                           NULL);
+                                           "Open", "Cancel");
 
-    result = gtk_dialog_run(GTK_DIALOG(dialogue));
+    result = gtk_native_dialog_run (dialogue);
     if (result == GTK_RESPONSE_ACCEPT)
     {
         char *path;
@@ -240,7 +238,7 @@ action_open_document (BlueditWindow *self)
         g_free(path);
     }
 
-    gtk_widget_destroy(dialogue);
+    g_object_unref (dialogue);
 }
 
 static void
